@@ -98,13 +98,6 @@ export default class App extends Component {
 
   onDelete = id => {
     const timerIdx = this.state.timers.findIndex(t => t._id === id);
-
-    // let nextTimers = [];
-    // for (let i = timerIdx + 1; i < this.state.timers.length; i++) {
-    //   nextTimers.push({ ...this.state.timers[i], _id: i });
-    // }
-
-    // const updatedTimers = [...this.state.timers.slice(0, timerIdx), ...nextTimers];
     const updatedTimers = [...this.state.timers.slice(0, timerIdx), ...this.state.timers.slice(timerIdx + 1)];
 
     this.setState({ timers: updatedTimers });
@@ -311,6 +304,14 @@ export default class App extends Component {
         </div>
         <div className="row">
           <div className="col-sm-12 col-md-4 col-lg-3 mt-4">
+            <div className="bg-dark text-white rounded shadow-sm p-3">
+              <div className="text-center my-4">
+                <h2 className="text-muted">Finished Rounds</h2>
+                <h1>{this.state.rounds}</h1>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-4 col-lg-3 mt-4">
             {this.state.timers.length !== 0 && (
               <WastedTime
                 wastedTime={this.state.wastedTime}
@@ -318,14 +319,6 @@ export default class App extends Component {
                 isWastedTimePaused={this.state.isWastedTimePaused}
               />
             )}
-          </div>
-          <div className="col-sm-12 col-md-4 col-lg-3 mt-4">
-            <div className="bg-dark text-white rounded shadow-sm p-3">
-              <div className="text-center my-4">
-                <h2 className="text-muted">Finished Rounds</h2>
-                <h1>{this.state.rounds}</h1>
-              </div>
-            </div>
           </div>
         </div>
       </div>
