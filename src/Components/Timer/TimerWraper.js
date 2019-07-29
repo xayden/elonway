@@ -123,9 +123,7 @@ class TimerWraper extends React.Component {
     return (
       <div className="col-sm-12 col-md-4 col-lg-3 mb-4">
         <div className="bg-dark text-white rounded shadow-sm p-3">
-          <h3>
-            <small className="text-secondary">#{this.state._id}</small> {this.state.name}
-          </h3>
+          <h3>{this.state.name}</h3>
           <Timer
             hours={hours}
             minutes={minutes}

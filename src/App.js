@@ -2,7 +2,8 @@ import React, { Component, Fragment } from 'react';
 
 import TimerWraper from './Components/Timer/TimerWraper';
 import WastedTime from './Components/Timer/WastedTime';
-import { tsExpressionWithTypeArguments, whileStatement } from '@babel/types';
+
+const shortid = require('shortid');
 
 export default class App extends Component {
   constructor(props) {
@@ -27,6 +28,7 @@ export default class App extends Component {
       audioTimer: 20000,
       isAdding: false,
       isDeleting: false,
+      rounds: 0,
       name: ''
     };
 
@@ -85,7 +87,7 @@ export default class App extends Component {
       // }
       const newTimers = [
         ...this.state.timers,
-        { ...this.defaultTimer, name: this.state.name, _id: this.state.timers.length + 1 }
+        { ...this.defaultTimer, name: this.state.name, _id: shortid.generate() }
       ];
       this.setState({ timers: newTimers });
       this.setState({ name: '', isAdding: false });
@@ -152,17 +154,24 @@ export default class App extends Component {
   };
 
   startNextTimer = () => {
-    const nextTimer = this.state.finishedTimer + 1;
+    const nextTimerIdx = this.state.timers.findIndex(t => t._id === this.state.finishedTimer) + 1;
     let updatedState = {};
-    if (nextTimer <= this.state.timers.length) {
+
+    if (nextTimerIdx < this.state.timers.length) {
       updatedState = {
-        currentPlayingTimer: this.state.timers[nextTimer - 1]._id,
+        currentPlayingTimer: this.state.timers[nextTimerIdx]._id,
         puasedTimer: '',
         finishedTimer: ''
       };
     } else if (this.state.timers[0]) {
-      updatedState = { currentPlayingTimer: 1, puasedTimer: '', finishedTimer: '' };
+      updatedState = {
+        currentPlayingTimer: this.state.timers[0]._id,
+        puasedTimer: '',
+        finishedTimer: '',
+        rounds: this.state.rounds + 1
+      };
     }
+
     this.setState({ ...updatedState, audioTimer: 20000 });
     this._stopAudio();
   };
@@ -192,8 +201,9 @@ export default class App extends Component {
   };
 
   onTimerFinish = () => {
-    const timer = this.state.timers[parseInt(this.state.currentPlayingTimer) - 1];
-    const audio = document.getElementById(timer.sound);
+    const finishedTimer = this.state.timers.find(t => t._id === this.state.currentPlayingTimer);
+    const audio = document.getElementById(finishedTimer.sound);
+
     this.setState(prevState => ({
       currentPlayingTimer: '',
       pausedTimer: '',
@@ -236,7 +246,13 @@ export default class App extends Component {
           <div className="col-12 col-md-3">
             {this.state.finishedTimer && (
               <div className="alert alert-success" role="alert">
-                {this.state.timers[parseInt(this.state.finishedTimer) - 1].name} timer has finished playing
+                <strong>
+                  {
+                    this.state.timers[this.state.timers.findIndex(t => t._id === this.state.finishedTimer)]
+                      .name
+                  }
+                </strong>{' '}
+                timer has finished playing
                 <button className="btn btn-success ml-2" onClick={this.startNextTimer}>
                   Continue
                 </button>
@@ -303,29 +319,6 @@ export default class App extends Component {
             <button className="btn btn-primary w-150" onClick={this.handleAddTimer}>
               Add Timer
             </button>
-            {/* {this.state.isDeleting && (
-              <Fragment>
-                <input
-                  ref={this.input}
-                  name="name"
-                  type="text"
-                  value={this.state.name}
-                  className="form-control mx-2"
-                  style={{
-                    height: 38,
-                    width: 150
-                  }}
-                  onChange={this.handleChange}
-                  onKeyDown={this.handleKeyDown}
-                />
-                <button className="btn btn-danger mr-2" onClick={this.handleCancel}>
-                  X
-                </button>
-              </Fragment>
-            )}
-            <button className="btn btn-danger w-150 ml-2" onClick={this.handleDeleteTimer}>
-              Delete Timer
-            </button> */}
           </div>
         </div>
         <div className="row">
@@ -337,6 +330,14 @@ export default class App extends Component {
                 isWastedTimePaused={this.state.isWastedTimePaused}
               />
             )}
+          </div>
+          <div className="col-sm-12 col-md-4 col-lg-3 mt-4">
+            <div className="bg-dark text-white rounded shadow-sm p-3">
+              <div className="text-center my-4">
+                <h2 className="text-muted">Finished Rounds</h2>
+                <h1>{this.state.rounds}</h1>
+              </div>
+            </div>
           </div>
         </div>
       </div>
