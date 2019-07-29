@@ -1,0 +1,11 @@
+body {
+  background-color: #191919;
+}
+
+.bg-dark {
+  background-color: #222222 !important;
+}
+
+.w-150 {
+  width: 150px !important;
+}
