@@ -177,7 +177,8 @@ export default class App extends Component {
       wastedTime: 0,
       audioTimer: 20000,
       isWastedTimePaused: true,
-      doReset: true
+      doReset: true,
+      rounds: 0
     });
     this._stopAudio();
   };
