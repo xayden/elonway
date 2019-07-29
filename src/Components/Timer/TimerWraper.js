@@ -14,8 +14,13 @@ class TimerWraper extends React.Component {
       hours: 0,
       minutes: 0,
       seconds: 0,
-      isPaused: true
+      isPaused: true,
+      editing: false,
+      newName: ''
     };
+
+    this.input = React.createRef();
+    this.keys = { ESC: 27, ENTER: 13 };
   }
 
   componentDidMount() {
@@ -78,6 +83,34 @@ class TimerWraper extends React.Component {
     }
   };
 
+  handleChange = e => {
+    this.setState({ newName: e.target.value });
+  };
+
+  handleKeyDown = e => {
+    if (e.which === this.keys.ESC) {
+      this.cancelEdit();
+    } else if (e.which === this.keys.ENTER) {
+      const newTimer = {
+        _id: this.state._id,
+        name: this.state.newName,
+        startTime: this.state.startTime,
+        currentTime: this.state.currentTime,
+        sound: this.state.sound
+      };
+      this.setState({ ...newTimer, newName: '', editing: false });
+      this.props.onTimerUpdate(newTimer);
+    }
+  };
+
+  handleEdit = () => {
+    this.setState({ editing: true, newName: this.state.name });
+  };
+
+  cancelEdit = () => {
+    this.setState({ newName: '', editing: false });
+  };
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.onReset) {
       this.setState({ currentTime: this.state.startTime });
@@ -95,6 +128,10 @@ class TimerWraper extends React.Component {
       this.props.currentPlayingTimer !== this.state._id
     ) {
       this.pause();
+    } else if (!prevState.editing && this.state.editing) {
+      const node = this.input.current;
+      node.focus();
+      node.select();
     }
   }
 
@@ -123,7 +160,27 @@ class TimerWraper extends React.Component {
     return (
       <div className="col-sm-12 col-md-4 col-lg-3 mb-4">
         <div className="bg-dark text-white rounded shadow-sm p-3">
-          <h3>{this.state.name}</h3>
+          <div className="form-inline">
+            {this.state.editing ? (
+              <input
+                ref={this.input}
+                name="name"
+                type="text"
+                value={this.state.newName}
+                className="form-control mr-2"
+                style={{
+                  height: 38,
+                  width: 150
+                }}
+                onChange={this.handleChange}
+                onKeyDown={this.handleKeyDown}
+                onBlur={this.cancelEdit}
+              />
+            ) : (
+              <h3 onDoubleClick={this.handleEdit}>{this.state.name}</h3>
+            )}
+          </div>
+          {/* <h3>{this.state.name}</h3> */}
           <Timer
             hours={hours}
             minutes={minutes}
@@ -174,6 +231,12 @@ class TimerWraper extends React.Component {
               </li>
             </div>
           </div>
+          <button
+            className="btn btn-block btn-danger mt-2"
+            onClick={() => this.props.onDelete(this.state._id)}
+          >
+            Delete
+          </button>
         </div>
       </div>
     );

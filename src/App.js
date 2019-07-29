@@ -27,7 +27,6 @@ export default class App extends Component {
       isWastedTimePaused: true,
       audioTimer: 20000,
       isAdding: false,
-      isDeleting: false,
       rounds: 0,
       name: ''
     };
@@ -72,19 +71,8 @@ export default class App extends Component {
 
   handleKeyDown = e => {
     if (e.which === this.keys.ESC) {
-      this.setState({ name: '', isAdding: false, isDeleting: false });
+      this.setState({ name: '', isAdding: false });
     } else if (e.which === this.keys.ENTER) {
-      // if (this.state.isAdding) {
-      //   const newTimers = [
-      //     ...this.state.timers,
-      //     { ...this.defaultTimer, name: this.state.name, _id: this.state.timers.length + 1 }
-      //   ];
-      //   this.setState({ timers: newTimers });
-      //   this.setState({ name: '', isAdding: false });
-      //   localStorage.setItem('timers', JSON.stringify(newTimers));
-      // } else if (this.state.isDeleting) {
-      //   this.deleteTimer(this.state.name);
-      // }
       const newTimers = [
         ...this.state.timers,
         { ...this.defaultTimer, name: this.state.name, _id: shortid.generate() }
@@ -108,22 +96,21 @@ export default class App extends Component {
     localStorage.setItem('timers', JSON.stringify(updatedTimers));
   };
 
-  // deleteTimer = id => {
-  //   const timerIdx = this.state.timers.findIndex(t => t._id === parseInt(id));
+  onDelete = id => {
+    const timerIdx = this.state.timers.findIndex(t => t._id === id);
 
-  //   let nextTimers = [];
-  //   for (let i = timerIdx + 1; i < this.state.timers.length; i++) {
-  //     nextTimers.push({ ...this.state.timers[i], _id: i });
-  //   }
+    // let nextTimers = [];
+    // for (let i = timerIdx + 1; i < this.state.timers.length; i++) {
+    //   nextTimers.push({ ...this.state.timers[i], _id: i });
+    // }
 
-  //   // const updatedTimers = [...this.state.timers.slice(0, timerIdx), ...this.state.timers.slice(timerIdx + 1)];
-  //   const updatedTimers = [...this.state.timers.slice(0, timerIdx), ...nextTimers];
+    // const updatedTimers = [...this.state.timers.slice(0, timerIdx), ...nextTimers];
+    const updatedTimers = [...this.state.timers.slice(0, timerIdx), ...this.state.timers.slice(timerIdx + 1)];
 
-  //   console.log(updatedTimers);
-  //   this.setState({ timers: updatedTimers, isDeleting: false, name: '' });
-  //   localStorage.removeItem('timers');
-  //   localStorage.setItem('timers', JSON.stringify(updatedTimers));
-  // };
+    this.setState({ timers: updatedTimers });
+    localStorage.removeItem('timers');
+    localStorage.setItem('timers', JSON.stringify(updatedTimers));
+  };
 
   startWastedTimer = () => {
     this.wastedTime = setInterval(() => {
@@ -273,6 +260,7 @@ export default class App extends Component {
               onTimerFinish={this.onTimerFinish}
               onTimerUpdate={this.onTimerUpdate}
               onReset={this.state.doReset}
+              onDelete={this.onDelete}
             />
           ))}
           <div className="col-sm-12 col-md-6 col-lg-4 mb-4">
