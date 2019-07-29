@@ -84,6 +84,8 @@ export default class App extends Component {
   };
 
   onTimerUpdate = newTimer => {
+    console.log('Called on timer update');
+    console.log(newTimer);
     const oldTimerIdx = this.state.timers.findIndex(t => t._id === newTimer._id);
     const updatedTimers = [
       ...this.state.timers.slice(0, oldTimerIdx),
@@ -182,7 +184,7 @@ export default class App extends Component {
 
   onTimerFinish = () => {
     const finishedTimer = this.state.timers.find(t => t._id === this.state.currentPlayingTimer);
-    const audio = document.getElementById(finishedTimer.sound);
+    this.audio = document.getElementById('audio_' + finishedTimer._id);
 
     this.setState(prevState => ({
       currentPlayingTimer: '',
@@ -190,7 +192,7 @@ export default class App extends Component {
       finishedTimer: prevState.currentPlayingTimer
     }));
 
-    this._startAudio(audio);
+    this._startAudio();
   };
 
   switchPlayState = () => {
@@ -201,13 +203,12 @@ export default class App extends Component {
     }
   };
 
-  _startAudio = audio => {
+  _startAudio = () => {
+    this.audio.play();
     this.audioTime = setInterval(() => {
       if (this.state.audioTimer <= 0) {
-        clearInterval(this.audioTime);
+        this._stopAudio();
       } else {
-        audio.currentTime = 0;
-        audio.play();
         this.setState(prevState => ({ audioTimer: prevState.audioTimer - 1000 }));
       }
     }, 1000);
@@ -215,6 +216,8 @@ export default class App extends Component {
 
   _stopAudio = () => {
     if (this.audioTime) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
       clearInterval(this.audioTime);
     }
   };

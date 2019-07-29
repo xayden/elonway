@@ -20,6 +20,8 @@ class TimerWraper extends React.Component {
     };
 
     this.input = React.createRef();
+    this.audioInput = React.createRef();
+    this.audioElem = React.createRef();
     this.keys = { ESC: 27, ENTER: 13 };
   }
 
@@ -32,10 +34,13 @@ class TimerWraper extends React.Component {
       startTime: parseInt(timer.startTime),
       currentTime: parseInt(timer.currentTime) || parseInt(timer.startTime)
     });
+
+    // this.audioElem.current.src = timer.sound;
   }
 
   componentWillUnmount() {
     this.pause();
+    URL.revokeObjectURL(this.audioElem.src);
   }
 
   start = () => {
@@ -111,6 +116,26 @@ class TimerWraper extends React.Component {
     this.setState({ newName: '', editing: false });
   };
 
+  handleAudioInputChange = () => {
+    const audioElem = this.audioElem.current;
+    audioElem.src = URL.createObjectURL(this.audioInput.current.files[0]);
+
+    const newTimer = {
+      _id: this.state._id,
+      name: this.state.name,
+      startTime: this.state.startTime,
+      currentTime: this.state.currentTime,
+      sound: audioElem.src
+    };
+
+    this.props.onTimerUpdate(newTimer);
+    this.setState({ sound: audioElem.src });
+
+    // audioElem.onend = e => {
+    //   URL.revokeObjectURL(this.audioElem.src);
+    // };
+  };
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.onReset) {
       this.setState({ currentTime: this.state.startTime });
@@ -134,19 +159,6 @@ class TimerWraper extends React.Component {
       node.select();
     }
   }
-
-  setSound = e => {
-    const newTimer = {
-      _id: this.state._id,
-      name: this.state.name,
-      startTime: this.state.startTime,
-      currentTime: this.state.currentTime,
-      sound: e.target.innerHTML
-    };
-
-    this.props.onTimerUpdate(newTimer);
-    this.setState({ sound: e.target.innerHTML });
-  };
 
   render() {
     let seconds = Math.floor((this.state.currentTime / 1000) % 60),
@@ -180,7 +192,6 @@ class TimerWraper extends React.Component {
               <h3 onDoubleClick={this.handleEdit}>{this.state.name}</h3>
             )}
           </div>
-          {/* <h3>{this.state.name}</h3> */}
           <Timer
             hours={hours}
             minutes={minutes}
@@ -190,47 +201,10 @@ class TimerWraper extends React.Component {
             isPaused={this.state.isPaused}
             bgColor={this.props.currentPlayingTimer === this.state._id ? 'text-warning' : 'text-white'}
           />
-          <div className="dropdown">
-            <button
-              className="btn btn-block btn-outline-success dropdown-toggle"
-              type="button"
-              id="dropdownMenuButton"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              {this.state.sound || '-- Select an audio -- '}
-            </button>
-            <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <li className="dropdown-item" onClick={this.setSound}>
-                clap
-              </li>
-              <li className="dropdown-item" onClick={this.setSound}>
-                hihat
-              </li>
-              <li className="dropdown-item" onClick={this.setSound}>
-                kick
-              </li>
-              <li className="dropdown-item" onClick={this.setSound}>
-                openhat
-              </li>
-              <li className="dropdown-item" onClick={this.setSound}>
-                boom
-              </li>
-              <li className="dropdown-item" onClick={this.setSound}>
-                ride
-              </li>
-              <li className="dropdown-item" onClick={this.setSound}>
-                snare
-              </li>
-              <li className="dropdown-item" onClick={this.setSound}>
-                tom
-              </li>
-              <li className="dropdown-item" onClick={this.setSound}>
-                tink
-              </li>
-            </div>
-          </div>
+
+          <input type="file" ref={this.audioInput} onChange={this.handleAudioInputChange} />
+          <audio id={'audio_' + this.state._id} ref={this.audioElem} />
+
           <button
             className="btn btn-block btn-danger mt-2"
             onClick={() => this.props.onDelete(this.state._id)}
