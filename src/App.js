@@ -3,6 +3,8 @@ import React, { Component, Fragment } from 'react';
 import TimerWraper from './Components/Timer/TimerWraper';
 import WastedTime from './Components/Timer/WastedTime';
 
+import default_alarm from './count_the_stars.mp3';
+
 const shortid = require('shortid');
 
 export default class App extends Component {
@@ -45,6 +47,7 @@ export default class App extends Component {
     this.setState({
       timers: JSON.parse(localStorage.getItem('timers')) || []
     });
+    this.audioElem.current.src = URL.createObjectURL(new Blob([default_alarm]), { type: 'application/mp3' });
   }
 
   componentDidUpdate(prevProps, prevState) {
