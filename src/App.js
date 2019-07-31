@@ -37,6 +37,8 @@ export default class App extends Component {
     };
     this.keys = { ESC: 27, ENTER: 13 };
     this.input = React.createRef();
+    this.audioInput = React.createRef();
+    this.audioElem = React.createRef();
   }
 
   componentDidMount() {
@@ -191,7 +193,9 @@ export default class App extends Component {
 
   onTimerFinish = () => {
     const finishedTimer = this.state.timers.find(t => t._id === this.state.currentPlayingTimer);
-    this.audio = document.getElementById('audio_' + finishedTimer._id);
+    const timerAudio = document.getElementById('audio_' + finishedTimer._id);
+    if (timerAudio.src) this.audio = timerAudio;
+    else this.audio = document.getElementById('audio_default');
 
     this.setState(prevState => ({
       currentPlayingTimer: '',
@@ -227,6 +231,11 @@ export default class App extends Component {
       this.audio.currentTime = 0;
       clearInterval(this.audioTime);
     }
+  };
+
+  handleAudioInputChange = () => {
+    const audioElem = this.audioElem.current;
+    audioElem.src = URL.createObjectURL(this.audioInput.current.files[0]);
   };
 
   render() {
@@ -282,6 +291,12 @@ export default class App extends Component {
               <button className="btn btn btn-danger mb-3 shadow-sm w-150" onClick={this.resetTimer}>
                 Reset 🏁️
               </button>
+            </div>
+            <div className="row no-gutters">
+              <span className="h6 text-muted mt-1 mr-2">Default Alarm: </span>
+
+              <input type="file" ref={this.audioInput} onChange={this.handleAudioInputChange} />
+              <audio id="audio_default" ref={this.audioElem} loop />
             </div>
           </div>
         </div>

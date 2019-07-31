@@ -13,9 +13,9 @@ export default function WastedTime(props) {
       <div className="text-center my-4">
         <h3>Wasted Time</h3>
         <span className="h1">{wastedHr + ' : ' + wastedMin + ' : ' + wastedSec}</span>
-        <button className="btn btn-block btn-outline-warning mt-4" onClick={props.handlePauseWastedTime}>
+        {/* <button className="btn btn-block btn-outline-warning mt-4" onClick={props.handlePauseWastedTime}>
           {props.isWastedTimePaused ? 'PAUSED ▶️' : 'PAUSE ⏸️'}
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -120,16 +120,16 @@ class TimerWraper extends React.Component {
     const audioElem = this.audioElem.current;
     audioElem.src = URL.createObjectURL(this.audioInput.current.files[0]);
 
-    const newTimer = {
-      _id: this.state._id,
-      name: this.state.name,
-      startTime: this.state.startTime,
-      currentTime: this.state.currentTime,
-      sound: audioElem.src
-    };
+    // const newTimer = {
+    //   _id: this.state._id,
+    //   name: this.state.name,
+    //   startTime: this.state.startTime,
+    //   currentTime: this.state.currentTime,
+    //   sound: audioElem.src
+    // };
 
-    this.props.onTimerUpdate(newTimer);
-    this.setState({ sound: audioElem.src });
+    // this.props.onTimerUpdate(newTimer);
+    // this.setState({ sound: audioElem.src });
 
     // audioElem.onend = e => {
     //   URL.revokeObjectURL(this.audioElem.src);
@@ -203,10 +203,10 @@ class TimerWraper extends React.Component {
           />
 
           <input type="file" ref={this.audioInput} onChange={this.handleAudioInputChange} />
-          <audio id={'audio_' + this.state._id} ref={this.audioElem} />
+          <audio id={'audio_' + this.state._id} ref={this.audioElem} loop />
 
           <button
-            className="btn btn-block btn-danger mt-2"
+            className="btn btn-block btn-danger mt-3"
             onClick={() => this.props.onDelete(this.state._id)}
           >
             Delete
