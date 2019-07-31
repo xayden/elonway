@@ -53,8 +53,22 @@ export default class App extends Component {
     }
   }
 
+  _addTimer = () => {
+    const newTimers = [
+      ...this.state.timers,
+      { ...this.defaultTimer, name: this.state.name, _id: shortid.generate() }
+    ];
+    this.setState({ timers: newTimers });
+    this.setState({ name: '', isAdding: false });
+    localStorage.setItem('timers', JSON.stringify(newTimers));
+  };
+
   handleAddTimer = () => {
-    this.setState({ isAdding: true });
+    if (this.state.isAdding) {
+      this._addTimer();
+    } else {
+      this.setState({ isAdding: true });
+    }
   };
 
   handleDeleteTimer = () => {
@@ -73,19 +87,11 @@ export default class App extends Component {
     if (e.which === this.keys.ESC) {
       this.setState({ name: '', isAdding: false });
     } else if (e.which === this.keys.ENTER) {
-      const newTimers = [
-        ...this.state.timers,
-        { ...this.defaultTimer, name: this.state.name, _id: shortid.generate() }
-      ];
-      this.setState({ timers: newTimers });
-      this.setState({ name: '', isAdding: false });
-      localStorage.setItem('timers', JSON.stringify(newTimers));
+      this._addTimer();
     }
   };
 
   onTimerUpdate = newTimer => {
-    console.log('Called on timer update');
-    console.log(newTimer);
     const oldTimerIdx = this.state.timers.findIndex(t => t._id === newTimer._id);
     const updatedTimers = [
       ...this.state.timers.slice(0, oldTimerIdx),
