@@ -50,7 +50,9 @@ class TimerWraper extends React.Component {
           this.props.onTimerFinish(); // react throws an error in the console for this!
           this.setState({ currentTime: this.state.startTime });
           return this.pause();
-        } else return { currentTime: prevState.currentTime - 1000 };
+        } else {
+          return { currentTime: prevState.currentTime - 1000 };
+        }
       });
     }, 1000);
   };
@@ -169,6 +171,7 @@ class TimerWraper extends React.Component {
     minutes = minutes < 10 ? '0' + minutes : minutes;
     seconds = seconds < 10 ? '0' + seconds : seconds;
 
+    document.title = hours + ':' + minutes + ':' + seconds;
     return (
       <div className="col-sm-12 col-md-4 col-lg-3 mb-4">
         <div className="bg-dark text-white rounded shadow-sm p-3">
